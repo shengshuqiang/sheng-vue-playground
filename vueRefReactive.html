@@ -1,0 +1,86 @@
+<!-- 在线引入 -->
+<!-- <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script> -->
+<!-- 本地同文件夹引入 -->
+<script src="./vue.global.js"></script>
+
+<div id="app">
+    <!-- ref 和 reactive 测试声明响应式字符串 -->
+    <div id="msg" @click="onMsgClick" class="btn"> Msg: {{ msg }} </div>
+    <div id="msgObj" @click="onMsgObjClick" class="btn"> MsgObj: {{ msgObj.msg }} </div>
+    <div id="msgRef" @click="onMsgRefClick" class="btn"> MsgRef: {{ msgRef }} </div>
+    <div id="msgReactive" @click="onMsgReactiveClick" class="btn"> MsgReactive: {{ msgReactive }} </div>
+    <div id="msgObjRef" @click="onMsgObjRefClick" class="btn"> MsgObjRef: {{ msgObjRef.msg }} </div>
+    <div id="msgObjReactive" @click="onMsgObjReactiveClick" class="btn"> MsgObjReactive: {{ msgObjReactive.msg }} </div>
+    <div class="desc" v-html="descRef"></div>
+</div>
+
+<script>
+    const { createApp, ref, reactive, onMounted, nextTick } = Vue;
+    const objStr = (obj) => (`${obj.constructor.name} ${JSON.stringify(obj)}`);
+    createApp({
+        setup() {
+            let msg = 'click';
+            const msgObj = { msg };
+            const msgRef = ref(msg);
+            let msgReactive = reactive(msg);
+            const msgObjRef = ref(msgObj);
+            const msgObjReactive = reactive(msgObj);
+            const descRef = ref('');
+            console.log({ msg, msgObj, msgRef, msgReactive, msgObjRef, msgObjReactive });
+
+            const refreshDesc = () => {
+                let desc = `msg(${msg}) === msgObj.msg(${msgObj.msg}): ${msg === msgObj.msg}`;
+                desc += `<br/>msg(${msg}) === msgRef.value(${msgRef.value}): ${msg === msgRef.value}`;
+                desc += `<br/>msg(${msg}) === msgReactive(${msgReactive}): ${msg === msgReactive}`;
+                desc += `<br/>msgObj(${objStr(msgObj)}) === msgObjRef.value(${objStr(msgObjRef.value)}): ${msgObj === msgObjRef.value}`;
+                desc += `<br/>msgObj(${objStr(msgObj)}) === msgObjReactive(${objStr(msgObjReactive)}): ${msgObj ===
+                    msgObjReactive}`;
+                desc += `<br/>msgObjRef.value(${objStr(msgObjRef.value)}) === msgObjReactive(${objStr(msgObjReactive)}): ${msgObjRef.value ===
+                    msgObjReactive}`;
+                descRef.value = desc;
+                console.log('handleClick nextTick desc=', desc);
+            };
+
+            // 通过点击处理，使用闭包函数存储点击数量累计值count
+            const handleClick = (() => {
+                let count = 0;
+                return () => {
+                    const msg = `click${++count}`;
+                    console.log('handleClick', msg);
+                    nextTick(refreshDesc);
+                    return msg;
+                };
+            })();
+            const onMsgClick = () => (msg = handleClick());
+            const onMsgObjClick = () => (msgObj.msg = handleClick());
+            const onMsgRefClick = () => (msgRef.value = handleClick());
+            const onMsgReactiveClick = () => (msgReactive = handleClick());
+            const onMsgObjRefClick = () => (msgObjRef.value.msg = handleClick());
+            const onMsgObjReactiveClick = () => (msgObjReactive.msg = handleClick());
+
+            // 初始化执行
+            refreshDesc();
+            return {
+                msg, msgObj, msgRef, msgReactive, msgObjRef, msgObjReactive, descRef,
+                onMsgClick, onMsgObjClick, onMsgRefClick, onMsgReactiveClick, onMsgObjRefClick, onMsgObjReactiveClick
+            }
+        }
+    }).mount('#app')
+</script>
+<style>
+    .btn {
+        width: 300px;
+        height: 50px;
+        line-height: 50px;
+        background: #00B85C;
+        color: white;
+        text-align: center;
+        margin-top: 30px;
+        cursor: pointer;
+        border-radius: 8px;
+    }
+
+    .desc {
+        margin-top: 30px;
+    }
+</style>

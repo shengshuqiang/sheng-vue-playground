@@ -1,0 +1,53 @@
+<!-- 网络引入 -->
+<!-- <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script> -->
+<!-- 本地文件引入官方Vue -->
+<script src="./vue.global.js"></script>
+<!-- 导入自己手写 DIYVue V0 -->
+<script src="./diy-vue.v0.global.js"></script>
+<div id="app">
+    <div class="btn" @click="countA0Ref++">countA0Ref: <span class="red">{{ countA0Ref }}</span></div>
+    <div class="btn">countA1ComputedRef(2 * countA0Ref): <span class="red">{{ countA1ComputedRef }}</span></div>
+</div>
+<script>
+    const containerOrSelector = "#app";
+    const { createApp } = Vue;
+    const { ref, computed } = DIYVue.init(containerOrSelector);
+    createApp({
+        setup() {
+            const countA0Ref = ref(1);
+            const countA1ComputedRef = computed(() => countA0Ref.value * 2);
+            console.log('setup', { countA0Ref, countA1ComputedRef });
+            return { countA0Ref, countA1ComputedRef };
+        },
+    }).mount(containerOrSelector);
+</script>
+<style>
+    .btn {
+        width: 500px;
+        height: 50px;
+        line-height: 50px;
+        background: #00B85C;
+        color: white;
+        text-align: center;
+        margin-top: 30px;
+        cursor: pointer;
+        border-radius: 8px;
+
+        .red {
+            color: red
+        }
+    }
+
+    body {
+        /* 禁止文本选中 */
+        -webkit-user-select: none;
+        /* Chrome/Safari */
+        -moz-user-select: none;
+        /* Firefox */
+        -ms-user-select: none;
+        /* IE10+ */
+        /* Rules below not needed in IE10+. Will not harm, though. */
+        -ms-user-select: none;
+        user-select: none;
+    }
+</style>

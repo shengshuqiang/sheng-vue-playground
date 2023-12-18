@@ -1,0 +1,57 @@
+<!-- 网络引入 -->
+<!-- <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script> -->
+<!-- 本地文件引入官方Vue -->
+<script src="./vue.global.js"></script>
+<!-- 导入自己手写 DIYVue V1 -->
+<script src="./diy-vue.v1.global.js"></script>
+
+<div id="app">
+    <div class="btn" @click="countA0Ref++">{{ `countA0Ref: ${countA0Ref}` }}</div> +
+    <div class="btn" @click="countA1Reactive.count++">{{ `countA1Reactive: ${countA1Reactive.count}` }}</div> =
+    <div class="btn">{{ `countA2ComputedRef: ${countA2ComputedRef}` }}</div>
+    <hr>
+    <div class="btn" @click="objRef.count=(objRef.count || 0)+1">{{ objRef?.count }}</div>
+</div>
+
+<script>
+    const containerOrSelector = "#app";
+    const { createApp } = Vue;
+    const { ref, computed, reactive } = DIYVue.init(containerOrSelector);
+    createApp({
+        setup() {
+            const countA0Ref = ref(1);
+            const countA1Reactive = reactive({ count: 2 });
+            const countA2ComputedRef = computed(() => countA0Ref.value + countA1Reactive.count);
+            const objRef = ref({ count: 0 });
+            return {
+                countA0Ref, countA1Reactive, countA2ComputedRef, objRef
+            };
+        },
+    }).mount(containerOrSelector);
+</script>
+<style>
+    .btn {
+        width: 300px;
+        height: 50px;
+        line-height: 50px;
+        background: #00B85C;
+        color: white;
+        text-align: center;
+        margin-top: 30px;
+        cursor: pointer;
+        border-radius: 8px;
+    }
+
+    body {
+        /* 禁止文本选中 */
+        -webkit-user-select: none;
+        /* Chrome/Safari */
+        -moz-user-select: none;
+        /* Firefox */
+        -ms-user-select: none;
+        /* IE10+ */
+        /* Rules below not needed in IE10+. Will not harm, though. */
+        -ms-user-select: none;
+        user-select: none;
+    }
+</style>

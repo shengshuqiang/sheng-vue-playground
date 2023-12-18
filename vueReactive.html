@@ -1,0 +1,30 @@
+<!-- 网络引入 -->
+<!-- <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script> -->
+<!-- 本地文件引入 -->
+<script src="./vue.global.js"></script>
+
+<div id="app">
+    <div>
+        <span @click="A0.value++">{{ A0.value }} </span> +
+        <span @click="A1.value++">{{ A1.value }}</span> = {{ A2 }}
+    </div>
+</div>
+
+<script>
+    const { createApp, reactive, computed } = Vue;
+
+    createApp({
+        setup() {
+            const A0 = reactive({ value: 0 });
+            const A1 = reactive({ value: 1 });
+            const A2 = computed(() => A0.value + A1.value);
+            console.log('setup()', { A0, A1, A2 });
+
+            return {
+                A0,
+                A1,
+                A2,
+            };
+        },
+    }).mount("#app");
+</script>
