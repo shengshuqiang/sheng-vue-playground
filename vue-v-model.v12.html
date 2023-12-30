@@ -1,0 +1,73 @@
+<!-- 网络引入 -->
+<!-- <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script> -->
+<!-- 本地文件引入 -->
+<script src="./vue.global.js"></script>
+<template id="custom-template">
+    <style>
+        span {
+            color: blue;
+        }
+    </style>
+    <div><span>{{multiple}}</span>倍数：<input :value="multiple * refCount" @input="refCount = $event.target.value / multiple" /></div>
+</template>
+
+<script>
+    // 定义一个类扩展自 HTMLElement
+    class CustomElement extends HTMLElement {
+        constructor() {
+            // 必须首先调用 super 方法
+            super();
+
+            // 创建一个 shadow root
+            const shadow = this.attachShadow({ mode: 'open' });
+            const template = document.getElementById('custom-template');
+            const shadowRoot = shadow.appendChild(template.content.cloneNode(true));
+        }
+    }
+
+    // 定义自定义元素
+    customElements.define('custom-element', CustomElement);
+</script>
+
+<div id="app">
+    <custom-element v-model="refCount" :multiple="1"></custom-element>
+    <hr>
+    <custom-element v-model="refCount" :multiple="2"></custom-element>
+<script>
+    const { createApp, ref } = Vue;
+
+    createApp({
+        setup() {
+            const refCount = ref(0);
+            console.log('setup()', { refCount });
+
+            return {
+                refCount
+            };
+        },
+    }).mount("#app");
+</script>
+<style>
+    #app {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 50px;
+        margin: 50px;
+        border: 1px solid gray;
+        border-radius: 20px;
+
+    }
+
+    input {
+        text-align: center;
+        padding: 10px;
+    }
+
+    hr {
+        width: 100%;
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
+</style>
