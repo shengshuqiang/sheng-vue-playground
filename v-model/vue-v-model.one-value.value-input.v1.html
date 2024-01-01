@@ -1,0 +1,113 @@
+<!-- 官网推荐v-model实现方式一：使用等价展开 :value 和 @input -->
+<!-- 网络引入 -->
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<!-- 本地文件引入 -->
+<!-- <script src="../vue/vue.global.js"></script> -->
+<!-- 组件模版 -->
+<template id="custom-template">
+    <div class="row">
+        <span class="red"> {{ multiple }} </span> 倍数：
+        <input type="number" :value="multipleValue()" @input="handleInput" onclick="this.select()" />
+    </div>
+</template>
+<!-- 组件JS代码 -->
+<script>
+    const CustomComponent = {
+        name: 'CustomComponent',
+        props: {
+            multiple: Number,
+            count: Number,
+        },
+        // 内联DOM模板
+        template: '#custom-template',
+        setup(props, { emit }) {
+            const { watch } = Vue;
+            console.log('SSU', `CustomComponent(${props.multiple}, ${props.count}) setup(props)`);
+            watch(props, (value) => { console.log('SSU', `CustomComponent(${props.multiple}, ${props.count}) watch(props)`, value); });
+            const multipleValue = () => {
+                const { count, multiple } = props;
+                const result = count * multiple;
+                console.log('SSU', `CustomComponent(${props.multiple},${props.count}) multipleValue()`,
+                    result, { multiple, count });
+                return result;
+            }
+            const handleInput = (event) => {
+                // event.target.value 返回的是字符串，即使type="number"，需要手动转换成整数
+                const { value } = event.target;
+                const count = +value;
+                const { multiple } = props;
+                const result = count / multiple;
+                console.log('SSU', `CustomComponent(${props.multiple}, ${props.count}) handleInput(event)`,
+                    result, { value, count, multiple });
+                // 考考你：为什么不需要给props.count赋值？
+                emit('update:count', result);
+            }
+            return { multipleValue, handleInput };
+        },
+    }
+</script>
+<div id="app">
+    <custom-component v-model:count="refCount" :multiple="multipleA"></custom-component>
+    <hr>
+    <custom-component :count="refCount" @update:count="handleUpdate" :multiple="multipleB"></custom-component>
+</div>
+<script>
+    const { createApp, ref } = Vue;
+    createApp({
+        components: {
+            CustomComponent,
+        },
+        setup() {
+            const multipleA = 1;
+            const multipleB = 2;
+            const refCount = ref(0);
+            const handleUpdate = (value) => {
+                console.log('SSU', 'handleUpdate(value)', value);
+                refCount.value = value;
+            }
+            return { multipleA, multipleB, refCount, handleUpdate };
+        },
+    }).mount("#app");
+</script>
+<style>
+    #app {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 50px;
+        margin: 50px;
+        border: 1px solid gray;
+        border-radius: 20px;
+    }
+
+    .row {
+        display: flex;
+        align-items: center;
+    }
+
+    .red {
+        color: red;
+        font-weight: bold;
+        font-size: larger;
+        margin: 3px;
+    }
+
+    hr {
+        width: 100%;
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
+
+    input {
+        text-align: center;
+        padding: 10px;
+    }
+
+    /* 去掉数字输入框右侧增减按钮 */
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+</style>

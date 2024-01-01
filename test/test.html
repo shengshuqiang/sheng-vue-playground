@@ -1,0 +1,42 @@
+<!-- 网络引入 -->
+<!-- <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script> -->
+<!-- 本地文件引入 -->
+<script src="../vue/vue.global.js"></script>
+
+<div id="app">
+    <div>
+        <span @click="A0++">{{ A0 }} </span> +
+        <span @click="A1++">{{ A1 }}</span> = {{ A2 }}
+    </div>
+</div>
+
+<script>
+    const { createApp, ref, computed, watch } = Vue;
+
+    createApp({
+        setup() {
+            const A0 = ref(0);
+            const A1 = ref(1);
+            const A2 = computed(() => A0.value + A1.value);
+            console.log('setup()', { A0, A1, A2 });
+            watch(
+                () => A0,
+                (newValue, oldValue) => {
+                    // newValue === oldValue
+                    console.log('watch()', { newValue, oldValue });
+                },
+                {
+                    deep: true,
+                    once: true // 只执行一次
+                }
+            )
+
+
+            return {
+                A0,
+                A1,
+                A2,
+            };
+        },
+    }).mount("#app");
+</script>

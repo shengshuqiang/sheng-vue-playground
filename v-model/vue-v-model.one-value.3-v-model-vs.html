@@ -1,0 +1,226 @@
+<!-- 三种 v-model 实现对决 -->
+<!-- 网络引入 -->
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<!-- 本地文件引入 -->
+<!-- <script src="../vue/vue.global.js"></script> -->
+<!-- 组件 v-model 等价展开（原生）实现模版 -->
+<template id="custom-v-model-raw-template">
+    <div class="row">
+        <span class="red"> {{ multiple }} </span> 倍数：
+        <input type="number" :value="multipleValue()" @input="handleInput" onclick="this.select()" />
+    </div>
+</template>
+<!-- 组件 v-model 语法糖模版 -->
+<template id="custom-v-model-sugar-template">
+    <div class="row">
+        <span class="red"> {{ multiple }} </span> 倍数：
+        <input type="number" v-model="modelValue" onclick="this.select()" />
+    </div>
+</template>
+<!-- 三种v-model实现组件JS代码 -->
+<script>
+    const CustomVModelRawComponent = {
+        // 官网推荐v-model实现方式一：使用等价展开 :value 和 @input
+        name: 'CustomVModelRawComponent',
+        props: {
+            multiple: Number,
+            count: Number,
+        },
+        // 内联DOM模板
+        template: '#custom-v-model-raw-template',
+        setup(props, { emit }) {
+            const { watch } = Vue;
+            console.log('SSU', `CustomVModelRawComponent(${props.multiple}, ${props.count})
+             setup(props)`);
+            watch(props, (value) => {
+                console.log('SSU', `CustomVModelRawComponent(${props.multiple}, 
+            ${props.count}) watch(props)`, value);
+            });
+            const multipleValue = () => {
+                const { count, multiple } = props;
+                const result = count * multiple;
+                console.log('SSU', `CustomVModelRawComponent(${props.multiple},${props.count})
+                 multipleValue()`,
+                    result, { multiple, count });
+                return result;
+            }
+            const handleInput = (event) => {
+                // event.target.value 返回的是字符串，即使type="number"，需要手动转换成整数
+                const { value } = event.target;
+                const count = +value;
+                const { multiple } = props;
+                const result = count / multiple;
+                console.log('SSU', `CustomVModelRawComponent(${props.multiple}, ${props.count})
+                 handleInput(event)`,
+                    result, { value, count, multiple });
+                // 考考你：为什么不需要给props.count赋值？
+                emit('update:count', result);
+            }
+            return { multipleValue, handleInput };
+        },
+    }
+    const CustomVModelComputedComponent = {
+        // 官网推荐v-model实现方式二：使用具有 getter 和 setter 属性的可写 `computed`
+        name: 'CustomVModelComputedComponent',
+        props: {
+            multiple: Number,
+            count: Number,
+        },
+        // 内联DOM模板
+        template: '#custom-v-model-sugar-template',
+        setup(props, { emit }) {
+            console.log('SSU', `CustomVModelComputedComponent(${props.multiple}, ${props.count})
+             setup(props)`, props);
+            const { computed } = Vue;
+            const computedRefCount = computed({
+                get() {
+                    const { multiple } = props;
+                    const result = multiple * props.count;
+                    console.log('SSU', `CustomVModelComputedComponent(${props.multiple}, ${props.count})
+                     computedRefCount get()`,
+                        result, { multiple, count: props.count });
+                    return result;
+                },
+                set(value) {
+                    // event.target.value 返回的是字符串，即使type="number"，需要手动转换成整数
+                    const count = +value;
+                    const { multiple } = props;
+                    const result = count / multiple;
+                    console.log('SSU', `CustomVModelComputedComponent(${props.multiple}, ${props.count})
+                     computedRefCount set(value)`,
+                        result, { multiple, value });
+                    emit('update:count', result);
+                }
+            });
+            console.log('SSU', `CustomVModelComputedComponent(${props.multiple}, ${props.count})
+             setup(props) end`,
+                { computedRefCount });
+            return { modelValue: computedRefCount }
+        }
+    }
+    const CustomVModelWatchComponent = {
+        // 官网未推荐但看到比较多的v-model实现方式三：使用 innerValue 和 watch
+        name: 'CustomVModelWatchComponent',
+        props: {
+            multiple: Number,
+            count: Number,
+        },
+        // 内联DOM模板
+        template: '#custom-v-model-sugar-template',
+        setup(props, { emit }) {
+            console.log('SSU', `CustomVModelWatchComponent(${props.multiple}, ${props.count})
+             setup(props)`, props);
+            const { watch } = Vue;
+            const innerValue = ref();
+            // 监听props属性，用于更新外部联动数据
+            watch(props, (value) => {
+                const { multiple, count } = props;
+                const result = count * multiple;
+                console.log('SSU', `CustomVModelWatchComponent(${multiple}, ${count}) watch(props)`,
+                    result, { multiple, count });
+                innerValue.value = result;
+            }, { immediate: true });
+            // 监听innerValue，用于发送更新到外部组件属性
+            watch(innerValue, (value) => {
+                const count = +value;
+                const { multiple } = props;
+                const result = count / multiple;
+                console.log('SSU', `CustomVModelWatchComponent(${multiple}, ${props.count})
+                 watch(innerValue)`,
+                    result, { multiple, value, count });
+                emit('update:count', result);
+            }, { immediate: true });
+            console.log('SSU', `CustomVModelWatchComponent(${props.multiple}, ${props.count})
+             setup(props) end`,
+                { innerValue });
+            return { modelValue: innerValue }
+        }
+    }
+</script>
+<div id="app">
+    <div class="group" v-for="(item, index) in refItems">
+        <h3>{{item.title}}</h3>
+        <!-- 注：一定要写成 <component></component> 这种，
+            如果直接写成 <component/>,后面 <hr> 和 <component> 就没解析出来，不显示了-->
+        <component :is="item.component" v-model:count="item.count" :multiple="multipleA"></component>
+        <hr>
+        <component :is="item.component" :count="item.count" :multiple="multipleB"
+            @update:count="(count) => handleUpdate(index, count)"></component>
+    </div>
+</div>
+<script>
+    const { createApp, ref } = Vue;
+    createApp({
+        components: {
+            CustomVModelRawComponent,
+            CustomVModelComputedComponent,
+            CustomVModelWatchComponent
+        },
+        setup() {
+            const multipleA = 1;
+            const multipleB = 2;
+            const refItems = ref([
+                { title: 'CustomVModelRawComponent', component: 'custom-v-model-raw-component', count: 0 },
+                { title: 'CustomVModelComputedComponent', component: 'custom-v-model-computed-component', count: 0 },
+                { title: 'CustomVModelWatchComponent', component: 'custom-v-model-watch-component', count: 0 },
+            ]);
+            const handleUpdate = (index, count) => {
+                console.log('SSU', 'handleUpdate(index, count)', { index, count });
+                refItems.value[index].count = count;
+            }
+            return { multipleA, multipleB, refItems, handleUpdate };
+        },
+    }).mount("#app");
+</script>
+<style>
+    #app {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .group {
+        display: flex;
+        width: 500px;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+        padding-bottom: 30px;
+        margin: 10px;
+        border: 1px solid gray;
+        border-radius: 20px;
+        margin-bottom: 20px;
+    }
+
+    .row {
+        display: flex;
+        align-items: center;
+    }
+
+    .red {
+        color: red;
+        font-weight: bold;
+        font-size: larger;
+        margin: 3px;
+    }
+
+    hr {
+        width: 100%;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    input {
+        text-align: center;
+        padding: 6px;
+    }
+
+    /* 去掉数字输入框右侧增减按钮 */
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+</style>

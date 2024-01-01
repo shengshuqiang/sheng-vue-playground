@@ -1,0 +1,114 @@
+<!-- 官网未推荐但看到比较多的v-model实现方式三：使用 innerValue 和 watch -->
+<!-- 网络引入 -->
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<!-- 本地文件引入 -->
+<!-- <script src="../vue/vue.global.js"></script> -->
+<!-- 组件模版 -->
+<template id="custom-template">
+    <div class="row">
+        <span class="red"> {{ multiple }} </span> 倍数：
+        <input type="number" v-model="innerValue" onclick="this.select()" />
+    </div>
+</template>
+<!-- 组件JS代码 -->
+<script>
+    const CustomComponent = {
+        name: 'CustomComponent',
+        props: {
+            multiple: Number,
+            count: Number,
+        },
+        // 内联DOM模板
+        template: '#custom-template',
+        setup(props, { emit }) {
+            console.log('SSU', `CustomComponent(${props.multiple}, ${props.count}) setup(props)`, props);
+            const { watch } = Vue;
+            const innerValue = ref();
+            // 监听props属性，用于更新外部联动数据
+            watch(props, (value) => {
+                const { multiple, count } = props;
+                const result = count * multiple;
+                console.log('SSU', `CustomComponent(${multiple}, ${count}) watch(props)`,
+                    result, { multiple, count });
+                innerValue.value = result;
+            }, { immediate: true });
+            // 监听innerValue，用于发送更新到外部组件属性
+            watch(innerValue, (value) => {
+                const count = +value;
+                const { multiple } = props;
+                const result = count / multiple;
+                console.log('SSU', `CustomComponent(${multiple}, ${props.count}) watch(innerValue)`,
+                    result, { multiple, value, count });
+                emit('update:count', result);
+            }, { immediate: true });
+            console.log('SSU', `CustomComponent(${props.multiple}, ${props.count}) setup(props) end`,
+                { innerValue });
+            return { innerValue }
+        }
+    }
+</script>
+<div id="app">
+    <custom-component v-model:count="refCount" :multiple="multipleA"></custom-component>
+    <hr>
+    <custom-component :count="refCount" @update:count="handleUpdate" :multiple="multipleB"></custom-component>
+</div>
+<script>
+    const { createApp, ref } = Vue;
+    createApp({
+        components: {
+            CustomComponent,
+        },
+        setup() {
+            const multipleA = 1;
+            const multipleB = 2;
+            const refCount = ref(0);
+            const handleUpdate = (value) => {
+                console.log('SSU', 'handleUpdate(value)', value);
+                refCount.value = value;
+            }
+            return { multipleA, multipleB, refCount, handleUpdate };
+        },
+    }).mount("#app");
+</script>
+<style>
+    #app {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 50px;
+        margin: 50px;
+        border: 1px solid gray;
+        border-radius: 20px;
+    }
+
+    .row {
+        display: flex;
+        align-items: center;
+    }
+
+    .red {
+        color: red;
+        font-weight: bold;
+        font-size: larger;
+        margin: 3px;
+    }
+
+    hr {
+        width: 100%;
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
+
+    input {
+        text-align: center;
+        padding: 10px;
+    }
+
+    /* 去掉数字输入框右侧增减按钮 */
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+</style>

@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "colordiff": "^1.0.4"
+  }
+}

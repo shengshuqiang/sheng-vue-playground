@@ -1,0 +1,52 @@
+<!-- 网络引入 -->
+<!-- <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script> -->
+<!-- 本地文件引入 -->
+<script src="../vue/vue.global.js"></script>
+<div id="app">
+    <h3>ref</h3>
+    <div class="btn" @click="onCountRefClick">{{ `countRef: ${countRef}` }} </div>
+    <br>
+    <hr>
+    <h3>reactive</h3>
+    <div class="btn" @click="onCountObjReactiveClick">{{ `countObjReactive: ${countObjReactive.count}` }}
+    </div>
+</div>
+<script>
+    const { createApp, ref, reactive } = Vue;
+    createApp({
+        setup() {
+            const countRef = ref(0);
+            const onCountRefClick = () => { debugger; countRef.value++; };
+            const countObjReactive = reactive({ count: 0 });
+            const onCountObjReactiveClick = () => { debugger; countObjReactive.count++; };
+            console.log('setup()', { countRef, countObjReactive });
+            return { countRef, onCountRefClick, countObjReactive, onCountObjReactiveClick };
+        },
+    }).mount("#app");
+</script>
+<style>
+    .btn {
+        width: 300px;
+        height: 50px;
+        line-height: 50px;
+        background: #00B85C;
+        color: white;
+        text-align: center;
+        margin-top: 30px;
+        cursor: pointer;
+        border-radius: 8px;
+    }
+
+    body {
+        /* 禁止文本选中 */
+        -webkit-user-select: none;
+        /* Chrome/Safari */
+        -moz-user-select: none;
+        /* Firefox */
+        -ms-user-select: none;
+        /* IE10+ */
+        /* Rules below not needed in IE10+. Will not harm, though. */
+        -ms-user-select: none;
+        user-select: none;
+    }
+</style>

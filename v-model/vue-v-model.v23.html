@@ -1,0 +1,79 @@
+<!-- 网络引入 -->
+<!-- <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script> -->
+<!-- 本地文件引入 -->
+<script src="../vue/vue.global.js"></script>
+<!-- 自定义组件UI模版 -->
+<!-- <template id="custom-component-template">
+    <div class="row">
+        <span class="red"> {{ multiple }} </span> 倍数：
+        <input :modelValue="computedRefCount" @input="computedRefCount = $event.target.value / multiple" />
+    </div>
+</template> -->
+<div id="app">
+    <custom-component v-model="refCount" :multiple="1"></custom-component>
+    <hr>
+    <!-- 浏览器的原生 HTML 解析行为限制：:model-value 和 @update:model-value 采用连字符命名会解析成 :modelValue 和 @update:modelValue；-->
+    <!-- 如果 :modelValue 和 @update:modelValue 采用小驼峰命名会解析成 :modelvalue 和 @update:modelvalue；-->
+    <custom-component :model-value="refCount" :multiple="2" @update:model-value="(value) => (refCount=value)">
+    </custom-component>
+</div>
+<script type="module">
+    // 方式二
+    import CustomComponent1 from './CustomComponent2.js';
+    // 方式三
+    import CustomComponent2 from './CustomComponent3.js';
+    const { createApp, ref } = Vue;
+
+    const app = createApp({
+        components: {
+            // CustomComponent: CustomComponent1,
+            CustomComponent: CustomComponent2
+        },
+        setup() {
+            const refCount = ref(0);
+            console.log('SSU', 'createApp setup()', {
+                refCount,
+                CustomComponent1,
+                CustomComponent2
+            });
+            return {
+                refCount,
+            };
+        },
+    }).mount("#app");
+</script>
+<style>
+    #app {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 50px;
+        margin: 50px;
+        border: 1px solid gray;
+        border-radius: 20px;
+    }
+
+    .row {
+        display: flex;
+        align-items: center;
+    }
+
+    .red {
+        color: red;
+        font-weight: bold;
+        font-size: larger;
+        margin: 3px;
+    }
+
+    input {
+        text-align: center;
+        padding: 10px;
+    }
+
+    hr {
+        width: 100%;
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
+</style>

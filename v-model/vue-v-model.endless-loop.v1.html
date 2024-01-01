@@ -1,0 +1,89 @@
+<!-- 网络引入 -->
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<!-- 本地文件引入 -->
+<!-- <script src="../vue/vue.global.js"></script> -->
+<div id="app">
+    <div class="row">
+        <span class="red"> {{refMultipleDataA.multiple}} </span> 倍数：
+        <input type="number" v-model="refMultipleDataA.count" onclick="this.select()" />
+    </div>
+    <hr>
+    <div class="row">
+        <span class="red"> {{refMultipleDataB.multiple}} </span> 倍数：
+        <input type="number" v-model="refMultipleDataB.count" onclick="this.select()" />
+    </div>
+</div>
+<script>
+    const { createApp, ref, watch } = Vue;
+    createApp({
+        setup() {
+            const refMultipleDataA = ref({
+                multiple: 1,
+                count: 0,
+            });
+            const refMultipleDataB = ref({
+                multiple: 2,
+                count: 0,
+            });
+            // 监听 refMultipleDataA 重新计算 refMultipleDataB
+            watch(refMultipleDataA, (refMultipleDataAValue, oldRefMultipleDataAValue) => {
+                const { multiple: multipleA, count: countA } = refMultipleDataAValue;
+                const { multiple: multipleB } = refMultipleDataB.value;
+                refMultipleDataB.value.count = countA / multipleA * multipleB;
+                console.log('SSU', 'watch(refMultipleDataA)', refMultipleDataAValue,
+                    { refMultipleDataAValue, refMultipleDataBValue: refMultipleDataB.value, oldRefMultipleDataAValue });
+            }, { deep: true });
+            // 监听 refMultipleDataB 重新计算 refMultipleDataA
+            watch(refMultipleDataB, (refMultipleDataBValue, oldRefMultipleDataBValue) => {
+                const { multiple: multipleA } = refMultipleDataA.value;
+                const { multiple: multipleB, count: countB } = refMultipleDataBValue;
+                refMultipleDataA.value.count = countB / multipleB * multipleA;
+                console.log('SSU', 'watch(refMultipleDataB)', refMultipleDataBValue,
+                    { refMultipleDataAValue: refMultipleDataA.value, refMultipleDataBValue, oldRefMultipleDataBValue });
+            }, { deep: true });
+            return { refMultipleDataA, refMultipleDataB };
+        },
+    }).mount("#app");
+</script>
+<style>
+    #app {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 50px;
+        margin: 50px;
+        border: 1px solid gray;
+        border-radius: 20px;
+    }
+
+    .row {
+        display: flex;
+        align-items: center;
+    }
+
+    .red {
+        color: red;
+        font-weight: bold;
+        font-size: larger;
+        margin: 3px;
+    }
+
+    hr {
+        width: 100%;
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
+
+    input {
+        text-align: center;
+        padding: 10px;
+    }
+
+    /* 去掉数字输入框右侧增减按钮 */
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+</style>

@@ -1,0 +1,80 @@
+<!-- 网络引入 -->
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<!-- 本地文件引入 -->
+<!-- <script src="../vue/vue.global.js"></script> -->
+<div id="app">
+    <div class="row">
+        <span class="red"> {{multipleA}} </span> 倍数：
+        <input type="number" v-model="refCountA" onclick="this.select()" />
+    </div>
+    <hr>
+    <div class="row">
+        <span class="red"> {{multipleB}} </span> 倍数：
+        <input type="number" v-model="refCountB" onclick="this.select()" />
+    </div>
+</div>
+<script>
+    const { createApp, ref, watch } = Vue;
+    createApp({
+        setup() {
+            const multipleA = 1;
+            const multipleB = 2;
+            const refCountA = ref(0);
+            const refCountB = ref(0);
+            watch(refCountA, (refCountAValue, oldRefCountAValue) => {
+                const result = refCountAValue / multipleA * multipleB;
+                refCountB.value = result;
+                console.log('SSU', 'watch(refCountA)', result,
+                    { refCountAValue, oldRefCountAValue, refCountBValue: refCountB.value });
+            });
+            watch(refCountB, (refCountBValue, oldRefCountBValue) => {
+                const result = refCountBValue / multipleB * multipleA;
+                refCountA.value = result;
+                console.log('SSU', 'watch(refCountB)', result,
+                    { refCountBValue, oldRefCountBValue, refCountAValue: refCountA.value });
+            });
+            return { multipleA, multipleB, refCountA, refCountB };
+        },
+    }).mount("#app");
+</script>
+<style>
+    #app {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 50px;
+        margin: 50px;
+        border: 1px solid gray;
+        border-radius: 20px;
+    }
+
+    .row {
+        display: flex;
+        align-items: center;
+    }
+
+    .red {
+        color: red;
+        font-weight: bold;
+        font-size: larger;
+        margin: 3px;
+    }
+
+    input {
+        text-align: center;
+        padding: 10px;
+    }
+
+    hr {
+        width: 100%;
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
+
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+</style>
