@@ -1,0 +1,125 @@
+<!-- 筛选项场景如何监听数据，如何避免死循环 -->
+<!-- 网络引入 -->
+<!-- <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script> -->
+<!-- cdn.bootcdn.net 公司内网可访问 -->
+<script src="https://cdn.bootcdn.net/ajax/libs/vue/3.3.4/vue.global.min.js"></script>
+<!-- 本地文件引入 -->
+<!-- <script src="../vue/vue.global.js"></script> -->
+<div id="app">
+    <button @click="fireInTheHole"> 开火 🔥 </button>
+    <div>{{computedRef}}</div>
+</div>
+<script type="module">
+    const { createApp, ref, computed, reactive, watch } = Vue;
+    createApp({
+        setup() {
+            console.log('SSU', `createApp setup()`);
+            const objReactive = reactive({ a: 'a', obj: { aa: 'obj.aa' } });
+            const objRef = ref({ a: 'a', obj: { aa: 'obj.aa' } });
+            let count = 0;
+            const fireInTheHole = () => {
+                console.log('SSU', `fireInTheHole()`, count, { objReactive: JSON.stringify(objReactive), objRefValue: JSON.stringify(objRef.value) });
+
+                count++;
+                objReactive.a = objReactive.a + '/' + count + '/a';
+                // objReactive.obj.aa = objReactive.obj.aa + '#' + count + '#aa';
+                objReactive.obj[`a${count}`] = '#' + count + '#aa';
+                objRef.value.a = objRef.value.a + '/' + count + '/a';
+                objRef.value.obj[`a${count}`] = '#' + count + '#aa';
+
+
+                if (count < 3) {
+                    setTimeout(fireInTheHole, 300);
+                }
+            }
+            const computedRef = computed({
+                innerValue: {},
+                get() {
+                    const result = JSON.stringify(objReactive) + "########" + JSON.stringify(objRef.value);
+                    console.log('SSU', `computedRef get()`, result, { innerValue: this.innerValue });
+                    // return this.innerValue;
+                    return result;
+                },
+                set(value) {
+                    console.log('SSU', `computedRef set()`, value);
+                    this.innerValue = value;
+                }
+            });
+            watch(objReactive,
+                (obj, oldOjb) => {
+                    console.log('SSU', `objReactive watch()`, JSON.stringify(obj));
+                });
+            watch(objRef.value,
+                (obj, oldOjb) => {
+                    console.log('SSU', `objRef watch()`, JSON.stringify(obj));
+                });
+            return { fireInTheHole, computedRef };
+        },
+    }).mount("#app");
+</script>
+<style>
+    #app {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 50px;
+        margin: 50px;
+        border: 1px solid gray;
+        border-radius: 20px;
+    }
+
+    button {
+        width: 300px;
+        height: 50px;
+        line-height: 50px;
+        color: #fff;
+        background: #00b85c;
+        border-color: #00b85c;
+        text-align: center;
+        margin-top: 30px;
+        cursor: pointer;
+        border-radius: 8px;
+        border-width: 0;
+        /* 禁止文本选中 */
+        -webkit-user-select: none;
+        /* Chrome/Safari */
+        -moz-user-select: none;
+        /* Firefox */
+        -ms-user-select: none;
+        /* IE10+ */
+        /* Rules below not needed in IE10+. Will not harm, though. */
+        -ms-user-select: none;
+        user-select: none;
+    }
+
+    .row {
+        display: flex;
+        align-items: center;
+    }
+
+    .red {
+        color: red;
+        font-weight: bold;
+        font-size: larger;
+        margin: 3px;
+    }
+
+    hr {
+        width: 100%;
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
+
+    input {
+        text-align: center;
+        padding: 10px;
+    }
+
+    /* 去掉数字输入框右侧增减按钮 */
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+</style>

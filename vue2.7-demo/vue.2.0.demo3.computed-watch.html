@@ -1,0 +1,39 @@
+<!-- CDN引入 -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script> -->
+<script src="https://code.juejin.cn/api/raw/7508356178359877667?id=7508356178359926819"></script>
+<!-- 本地文件引入 -->
+<!-- <script src="../vue/vue.v2.7.16.js"></script> -->
+
+<div id="app">
+  <button @click="add">+1</button>
+  <div>{{ doubleCount }}</div>
+</div>
+
+<script>
+  var app = new Vue({
+    el: "#app",
+    data: {
+      count: 0,
+    },
+    computed: {
+      doubleCount: function () {
+        this._ssu_scaffold.pushLevel();
+        // console.log(...this._ssu_scaffold.msgs(`doubleCount()`));
+        const result = 2 * this.count;
+        this._ssu_scaffold.popLevel();
+        return result;
+      },
+    },
+    watch: {
+      count: function (val) {
+        console.log(`SSU watch：侦听到count变更为${val}`);
+      },
+    },
+    methods: {
+      add: function () {
+        console.log("SSU add()");
+        this.count++;
+      },
+    },
+  });
+</script>

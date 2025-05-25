@@ -1,0 +1,34 @@
+<!-- CDN引入 -->
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<!-- <script src="https://code.juejin.cn/api/raw/7508364280128307215?id=7508364280128356367"></script> -->
+<!-- 本地文件引入 -->
+<!-- <script src="../vue/vue.v3.3.11.js"></script> -->
+
+<div id="app">{{`${arr[0]}-${arr[1]}`}}</div>
+
+<script>
+  const { createApp, ref, reactive, computed, watch, onMounted, nextTick } =
+    Vue;
+  createApp({
+    setup() {
+      const arr = ref([1, 2]);
+      const obj = ref({ 1: { 11: 11 } });
+      onMounted(() => {
+        console.log("mounted", { arr, obj });
+        setTimeout(() => {
+          arr.value[0] = 10;
+          arr.value[1] = 20;
+          obj.value[1][11] = 110;
+        }, 1000);
+        setTimeout(() => {
+          arr.value.splice(0, 2, -1, -2);
+          // arr.value = [-1, -2];
+        }, 2000);
+      });
+      return {
+        arr,
+        obj,
+      };
+    },
+  }).mount("#app");
+</script>

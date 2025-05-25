@@ -1,0 +1,39 @@
+<!-- CDN引入 -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script> -->
+<script src="https://code.juejin.cn/api/raw/7508356178359877667?id=7508356178359926819"></script>
+<!-- 本地文件引入 -->
+<!-- <script src="../vue/vue.v2.7.16.js"></script> -->
+
+<div id="app">
+  <my-input v-model="name"></my-input>
+  <p>Message is: {{ name }}</p>
+</div>
+
+<script>
+  var app = new Vue({
+    el: "#app",
+    components: {
+      'my-input': {
+        model: {
+          prop: "name",
+          event: "change",
+        },
+        props: {
+          name: String,
+        },
+        template: `
+          <div>
+            Hello 
+            <input
+              :value="name"
+              @input="$emit('change', $event.target.value)"
+            >
+          </div>
+        `,
+      },
+    },
+    data: {
+      name: "SSU",
+    },
+  });
+</script>

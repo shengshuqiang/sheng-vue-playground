@@ -1,0 +1,51 @@
+<!-- 网络引入 -->
+<script src="https://unpkg.com/vue@2.6">window.Vue3 = false;</script>
+<script src="https://unpkg.com/@vue/composition-api@1.7.2/dist/vue-composition-api.js"></script>
+
+<!-- <script src="../node_modules/@vue/composition-api/dist/vue-composition-api.js"></script> -->
+
+<!-- <script src="https://unpkg.com/vue@2.7.16/dist/vue.js"></script> -->
+<!-- <script src=" https://unpkg.com/vue@3/dist/vue.global.js">window.Vue3 = true;</script> -->
+<!-- 本地文件引入 -->
+<!-- <script src="../vue/vue.global.js"></script> -->
+
+<div id="app">
+    <div>
+        <span @click="onClick">{{ A0 }} </span>
+        <div v-for="item in A0">{{ `${item.name} -- ${item.val} ## ${item.label}` }}</div>
+    </div>
+</div>
+
+<script>
+    const { createApp, ref, computed, watch } = window.Vue3 ? Vue : VueCompositionAPI;
+    if (!window.Vue3) {
+        Vue.use(VueCompositionAPI);
+    }
+
+    createApp({
+        setup() {
+            const list = [{ name: 1, val: 11 }, { name: 2, val: 22 }, { name: 3, val: 33 }];
+            const A0 = ref();
+            A0.value = list;
+            const onClick = () => {
+                // debugger;
+                setTimeout(() => {
+                    list.forEach((item, index) => {
+                        item.label = 'label' + index;
+                        // item.name = 'name' + index;
+                        console.log('SSU setTimeout forEach', { item, index });
+                    });
+                    A0.value = list;
+                    // debugger;
+                    console.log('SSU setTimeout', A0.value);
+                }, 1000);
+            };
+
+
+            return {
+                A0,
+                onClick
+            };
+        },
+    }).mount("#app");
+</script>

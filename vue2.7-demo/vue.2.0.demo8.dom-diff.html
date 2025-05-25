@@ -1,0 +1,32 @@
+<!-- CDN引入 -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script> -->
+<script src="https://code.juejin.cn/api/raw/7508364280128307215?id=7508364280128356367"></script>
+<!-- 本地文件引入 -->
+<!-- <script src="../vue/vue.v2.7.16.js"></script> -->
+<div id="app">
+  <input
+    v-for="item in items"
+    :key="item.key"
+    v-model="item.value"
+    :placeholder="item.placeholder"
+  />
+</div>
+
+<script>
+  var app = new Vue({
+    el: "#app",
+    data: {
+      items: [
+        { placeholder: "aaa", value: "" },
+        { placeholder: "bbb", value: "" },
+      ],
+    },
+    mounted: function () {
+      console.log("mounted", this);
+      setTimeout(() => {
+        console.log("mounted setTimeout");
+        this.items[0].value = 1;
+      }, 3000);
+    },
+  });
+</script>

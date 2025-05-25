@@ -1,0 +1,113 @@
+<!-- CDN引入 -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script> -->
+<!-- 本地文件引入 -->
+<script src="../vue/vue.v2.7.16.js"></script>
+
+<!-- 什么叫响应式？数据变化了，视图跟着刷新。 -->
+<!-- 怎么做到的？ -->
+<!-- 1. Vue._init 会将data里面的key逐个Object.defineProperty(vm, 'count', proxyGetter/proxySetter) 数据监听，这里只是中转，实际监听是 Object.defineProperty(vm._data, key, reactiveGetter/reactiveSetter)，数据访问和赋值会被监听 -->
+<!-- 2. mounted会解析模版字符串 
+ "<div id="app">
+  <div @click="add">{{ count }}</div>
+</div>" 
+为
+render: "with(this){return _c('div',{attrs:{"id":"app"}},[_c('div',{on:{"click":add}},[_v(_s(count))])])}"
+格式化缩进如下：
+with(this){
+  return _c('div',
+  {
+    attrs:{
+      "id":"app"
+    }
+  },
+  [_c('div',
+      {
+        on:{"click":add}
+      },
+      [_v(_s(count))]
+     )
+  ])
+}
+注：_c = createElement；_v = createTextVNode；_s = toString；
+通过 new Function(code) 将字符串变成可运行函数
+-->
+<!-- 2. 先通过get收集依赖，render 会被依赖收集-->
+<!-- 调用 updateComponent 时，先赋值 Dep.target = updateComponent, 再执行 updateComponent()，如果 updateComponent 方法调用栈调用了 reactiveGetter，则 Dep.target 非空的方法就是响应式数据依赖方法，数据改变时会调用依赖方法列表
+     简而言之，响应式需要数据改变时直接重新调用依赖方法列表间接刷新视图，而依赖收集不是直接执行方法，而是执行前先赋值到全局变量Dep.target，响应式数据get调用时如果Dep.target非空，则记入该数据依赖方法列表，响应式数据set时将该数据依赖方法列表依次重新执行一遍。
+-->
+<!-- updateComponent 是更新组件方法，通过 vm._render() 获取最新vnode，通过vm.__patch__(prevVnode, vnode)进行dom diff增量更新视图 -->
+<!-- 计算属性computed用于替代模版中复杂计算逻辑，但是模版中其实是方法，computed增加了缓存处理
+ 计算属性是有setter和getter方法，默认传入函数的方式会将函数赋值给getter，而setter用的是空方法。getter是获取数据处理，可以增加一些获取返回前的逻辑，可以改值；而setter是设置数据处理，只能做些副作用处理，并不能改值。
+ computed值在初始化后直接挂在Vue里面，有值和对应getter、setter。
+ getter是computedGetter，内部是持有了改key对应的watcher，watcher持有用户定义的函数或者getter/setter方法。
+ computed依赖数据修改了，自身如何更新并刷新ui？
+
+  -->
+<!-- watch侦听一个值，computed可以侦听多个值组合变化，compted可以用watch实现，本质上是一个缓存。
+  watch和computer都会创建一个Watcher作为被收集的依赖 -->
+<!-- 只有data里面的数据会有Dep对象，computer和watch没有，不存储对应依赖收集，而是传给直接使用的data数据的Dep对象 -->
+<!-- Key? -->
+<!-- v-model? -->
+<!-- SSR? -->
+
+<div id="app">
+  <!-- <div @click="add">{{ count }}</div> -->
+  <!-- <div @click="addDeep">{{ clickInfo.deepCount }}</div> -->
+  <!-- <div>{{ doubleCount }}</div> -->
+  <div
+    v-for="(item, index) in items"
+    :key="index"
+  >
+  <!-- {{ `${index}. ${item}` }} -->
+    <input/> <button @click="del(index)">Del</button>
+  </div>
+</div>
+
+<script>
+  var app = new Vue({
+    el: "#app",
+    data: {
+      // count: 0,
+      // delta: 0.5,
+      items: [1, 2, 3],
+      // clickInfo: {
+      //   deepCount: 0,
+      // }
+    },
+    mounted: function () {
+      // setTimeout(() => {
+      // doubleCount后面变化也不会触发console.log
+      //   console.log("doubleCount", this.doubleCount);
+      // }, 3000);
+      setTimeout(() => {
+        console.log("setTimeout");
+        // this.delta = this.delta * 1.5;
+        // this.items[2] = 10;
+        // this.items.splice(2, 1, 10);
+      }, 5000);
+      // 没有设置对应computed的setter方法，赋值无效
+      // this.doubleCount.value = 100;
+    },
+    // computed: {
+    //   doubleCount: function () {
+    //     return 2 * this.count + this.delta;
+    //   }
+    // },
+    // watch: {
+    //   count: function (val) {
+    //     console.log(`SSU watch count ${val}`);
+    //   }
+    // },
+    methods: {
+      // add: function () {
+      //   this.count++;
+      // },
+      del: function (index) {
+        this.items.splice(index, 1);
+      },
+      // addDeep: function () {
+      //   this.clickInfo.deepCount++;
+      // },
+    },
+  });
+</script>

@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@vue/composition-api": "^1.7.2",
     "colordiff": "^1.0.4"
   }
 }
