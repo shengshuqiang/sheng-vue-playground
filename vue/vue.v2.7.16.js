@@ -3441,8 +3441,9 @@
     } else {
       updateComponent = function () {
         _ssu_scaffold.pushLevel();
-        console.log(..._ssu_scaffold.msgs(`updateComponent() 执行更新组件`));
-        vm._update(vm._render(), hydrating);
+        const vnode = vm._render();
+        console.log(..._ssu_scaffold.msgs(`updateComponent() 执行更新组件`, vnode));
+        vm._update(vnode, hydrating);
         _ssu_scaffold.popLevel();
       };
     }
@@ -5547,6 +5548,7 @@
   // inline hooks to be invoked on component VNodes during patch
   var componentVNodeHooks = {
     init: function (vnode, hydrating) {
+       console.log(..._ssu_scaffold.msgs(`componentVNodeHooks.init(${vnode}) ${hydrating}`, {vnode, hydrating}));
       if (
         vnode.componentInstance &&
         !vnode.componentInstance._isDestroyed &&
@@ -5713,6 +5715,7 @@
     // activeInstance in lifecycle state
     parent
   ) {
+    console.log(..._ssu_scaffold.msgs(`createComponentInstanceForVnode(${vnode}) ${parent}`, {vnode, parent}));
     var options = {
       _isComponent: true,
       _parentVnode: vnode,
@@ -7866,6 +7869,7 @@
     var isRenderedModule = makeMap("attrs,class,staticClass,staticStyle,key");
     // Note: this is a browser-only function so we can assume elms are DOM nodes.
     function hydrate(elm, vnode, insertedVnodeQueue, inVPre) {
+      console.log(..._ssu_scaffold.msgs(`SSR hydrate(${elm}, ${vnode})`, {elm, vnode}));
       var i;
       var tag = vnode.tag,
         data = vnode.data,
@@ -7883,18 +7887,22 @@
         }
       }
       if (isDef(data)) {
-        if (isDef((i = data.hook)) && isDef((i = i.init)))
+        if (isDef((i = data.hook)) && isDef((i = i.init))) {
+          console.log(..._ssu_scaffold.msgs(`SSR hydrate#init(${vnode})`, {vnode}));
           i(vnode, true /* hydrating */);
+        }
         if (isDef((i = vnode.componentInstance))) {
           // child component. it should have hydrated its own tree.
           initComponent(vnode, insertedVnodeQueue);
           return true;
         }
       }
+      console.log(..._ssu_scaffold.msgs(`SSR hydrate (${tag}, ${vnode}, ${children})`, {tag, vnode, children}));
       if (isDef(tag)) {
         if (isDef(children)) {
           // empty element, allow client to pick up and populate children
           if (!elm.hasChildNodes()) {
+            console.log(..._ssu_scaffold.msgs(`SSR hydrate#createChildren(${vnode}, ${children})`, {vnode, children}));
             createChildren(vnode, children, insertedVnodeQueue);
           } else {
             // v-html and domProps: innerHTML
@@ -7960,6 +7968,7 @@
           }
         }
       } else if (elm.data !== vnode.text) {
+        console.log(..._ssu_scaffold.msgs(`SSR hydrate elm.data = vnode.text(${elm.data}, ${vnode.text})`, {elm, vnode}));
         elm.data = vnode.text;
       }
       return true;
@@ -8008,6 +8017,7 @@
             if (oldVnode.nodeType === 1 && oldVnode.hasAttribute(SSR_ATTR)) {
               oldVnode.removeAttribute(SSR_ATTR);
               hydrating = true;
+              console.log(..._ssu_scaffold.msgs(`SSR hydrating ${SSR_ATTR}`));
             }
             if (isTrue(hydrating)) {
               if (hydrate(oldVnode, vnode, insertedVnodeQueue)) {
@@ -10419,6 +10429,7 @@
   Vue.prototype.__patch__ = inBrowser ? patch : noop;
   // public mount method
   Vue.prototype.$mount = function (el, hydrating) {
+    console.log(..._ssu_scaffold.msgs(`Vue.prototype.$mount(${el}) ${hydrating}`, {el, hydrating}));
     el = el && inBrowser ? query(el) : undefined;
     return mountComponent(this, el, hydrating);
   };
@@ -13368,6 +13379,7 @@
   });
   var mount = Vue.prototype.$mount;
   Vue.prototype.$mount = function (el, hydrating) {
+    console.log(..._ssu_scaffold.msgs(`Vue.prototype.$mount`));
     el = el && query(el);
     /* istanbul ignore if */
     if (el === document.body || el === document.documentElement) {

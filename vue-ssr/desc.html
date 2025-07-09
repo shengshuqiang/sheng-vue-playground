@@ -1,0 +1,13 @@
+<html>
+  <!-- 自定义组件 input-component -->
+  <div>
+    <input v-model="value" :placeholder="placeholder" />
+    <div>{{value}}</div>
+  </div>
+  <!-- 主体组件 App -->
+  <div id="app">
+    <div>{{ msg }}</div>
+    <button @click="add">{{ count }}</button>
+    <input-component placeholder="hello"></input-component>
+  </div>
+</html>

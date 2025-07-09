@@ -1,0 +1,49 @@
+<html lang="en">
+  <head>
+    <title>Hello SSR</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <!--  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>  -->
+    <script src="http://127.0.0.1:8080/vue.v2.7.16.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.15.3/axios.min.js"></script>
+    <script>
+      const preFetchData = {};
+
+      // 业务组件
+      const App = {
+        name: "app",
+        props: {},
+        // 内联DOM模板
+        template: `<div id="app"><div>{{ msg }}</div><button @click="add">{{ count }}</button></div>`,
+        data: function () {
+          return {
+            count: 0,
+            msg: "",
+            isNode: true,
+          };
+        },
+        preFetch: async function name(params) {
+          const responseData = await axios.get(
+            "http://localhost:8080/data.json"
+          );
+          return responseData;
+        },
+        created: async function () {
+          const responseData = await App.preFetch();
+          const name = responseData.data.name;
+          this.msg = `Hello ${name}`;
+        },
+        methods: {
+          add: function () {
+            this.count++;
+          },
+        },
+      };
+
+      new Vue({
+        render: (h) => h(App),
+      }).$mount("#app");
+    </script>
+  </body>
+</html>

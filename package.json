@@ -1,6 +1,10 @@
 {
   "dependencies": {
-    "@vue/composition-api": "^1.7.2",
-    "colordiff": "^1.0.4"
+    "axios": "^1.9.0",
+    "colordiff": "^1.0.4",
+    "express": "^4.21.2",
+    "vue": "^2.7.16",
+    "vue-server-renderer": "^2.7.16",
+    "vuex": "^4.1.0"
   }
 }

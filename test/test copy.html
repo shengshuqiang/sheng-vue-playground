@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>点击触发 JS 错误</title>
+</head>
+<body>
+    <button onclick="triggerError()">点击我触发 JS 错误</button>
+
+    <script>
+        function triggerError() {
+            console.log('triggerError');
+            // 故意触发一个 JavaScript 错误
+            nonExistentFunction();
+        }
+    </script>
+</body>
+</html>

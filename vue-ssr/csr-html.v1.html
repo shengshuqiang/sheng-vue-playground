@@ -1,0 +1,43 @@
+<html lang="en">
+  <head>
+    <title>Hello SSR</title>
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div>Hello sheng_SSU</div><button>0</button></div>
+    <script src="http://127.0.0.1:8080/vue.v2.7.16.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.15.3/axios.min.js"></script><script>
+const preFetchData = {};
+const App = {
+  name: "app",
+  props: {},
+  // 内联DOM模板
+  template: `<div id="app"><div>{{ msg }}</div><button @click="add">{{ count }}</button></div>`,
+  data: function () {
+    return {
+      count: 0,
+      msg: "",
+    };
+  },
+  preFetch: async function name(params) {
+    console.log("preFetch 开始，发送请求");
+    const responseData = await axios.get("http://localhost:8080/data.json");
+    preFetchData.data = responseData.data;
+    console.log("preFetch 结束，请求返回", responseData.data);
+  },
+  created: async function () {
+    console.log("created 开始");
+    if (!preFetchData.data) {
+      await App.preFetch();
+    }
+    const name = preFetchData.data.name;
+    this.msg = `Hello ${name}`;
+    console.log(`created 结束, this.msg=${this.msg}`);
+  },
+  methods: {
+    add: function () {
+      this.count++;
+    },
+  },
+};
+ new Vue({render: (h) => h(App)}).$mount("#app");</script>
+  </body>
+</html>

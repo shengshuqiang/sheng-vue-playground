@@ -1,0 +1,81 @@
+<!-- CDN引入 -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script> -->
+<!-- 本地文件引入 -->
+<!-- 组件模版 -->
+<template id="click-template">
+  <div>{{title}}<button @click="add">{{ count }}</button></div>
+</template>
+<!-- 组件JS代码 -->
+<script>
+  const ClickComponent = {
+    name: "click-component",
+    props: {
+      title: "",
+    },
+    // 内联DOM模板
+    template: "#click-template",
+    data: function () {
+      return { count: 0 };
+    },
+    methods: {
+      add: function () {
+        console.log("SSU add()");
+        this.count++;
+      },
+    },
+  };
+</script>
+
+<template id="input-template">
+  <div>
+    {{title}}<input v-model="value" />{{value}}
+  </div>
+</template>
+<div>
+  <!-- 组件JS代码 -->
+  <script>
+    const InputComponent = {
+      name: "input-component",
+      props: {
+        title: "",
+      },
+      // 内联DOM模板
+      template: "#input-template",
+      data: function () {
+        return { value: "" };
+      },
+    };
+  </script>
+
+  <script src="../vue/vue.v2.7.16.js"></script>
+
+  <div id="app">
+    <click-component
+      v-for="title in clickTitles"
+      :title="title"
+    ></click-component>
+    <input-component
+      v-for="title in inputTitles"
+      :title="title"
+    ></input-component>
+    <button @click="click">ClickB&InputB</button>
+  </div>
+
+  <script>
+    var app = new Vue({
+      el: "#app",
+      components: { ClickComponent, InputComponent },
+      data: {
+        clickTitles: ["ClickA", "ClickB", "ClickC"],
+        inputTitles: ["InputA", "InputB", "InputC"],
+      },
+      methods: {
+        click: function () {
+          console.log("SSU click()");
+          Vue.set(this.clickTitles, 1, this.clickTitles[1] + "B");
+          Vue.set(this.inputTitles, 1, this.inputTitles[1] + "B");
+        },
+      },
+    });
+  </script>
+</div>
