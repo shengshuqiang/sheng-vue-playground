@@ -16,7 +16,7 @@ const App = {
     };
   },
   preFetch: async function name(params) {
-    const responseData = await axios.get("http://localhost:8080/data.json");
+    const responseData = await axios.get("https://cdn.jsdelivr.net/gh/shengshuqiang/sheng-vue-playground@main/vue-ssr/data.json");
     console.log('preFetch', responseData.data);
     return responseData;
   },

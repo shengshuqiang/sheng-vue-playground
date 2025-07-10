@@ -30,7 +30,7 @@ const AppScriptStr = `
     preFetch: async function name(params) {
       console.log("before preFetch");
       const responseData = await axios.get(
-          "http://localhost:8080/data.json"
+          "https://cdn.jsdelivr.net/gh/shengshuqiang/sheng-vue-playground@main/vue-ssr/data.json"
         );
       const data = responseData.data;
       preFetchData.data = data;
@@ -77,8 +77,7 @@ const ServerScriptStr = `
   return {server_vue, App, preFetchData};
 `;
 const ClientScriptStr = `
-  <!--  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>  -->
-  <script src="http://127.0.0.1:8080/vue.v2.7.16.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/shengshuqiang/sheng-vue-playground@main/vue/vue.v2.7.16.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.15.3/axios.min.js"></script>
   <script>
     const preFetchData = {};
@@ -161,16 +160,18 @@ server.get("*", (req, res) => {
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   // 设置预检请求的缓存时间（可选）
   res.setHeader("Access-Control-Max-Age", "3600");
-  if (req.url === "/data.json") {
-    res.status(200).json({ name: "sheng_SSU" });
-  } else if (req.url === "/app.html") {
+  // if (req.url === "/data.json") {
+  //   res.status(200).json({ name: "sheng_SSU" });
+  // } else 
+  if (req.url === "/app.html") {
     serverSideRendering(req, res);
-  } else if (req.url === "/vue.v2.7.16.js") {
-    // http://127.0.0.1:8080/vue.v2.7.16.js
-    res.type("application/javascript"); // 手动设置 Content-Type
-    console.log(__dirname);
-    res.sendFile(path.join(__dirname, "public", "../../vue/vue.v2.7.16.js"));
   }
+  //  else if (req.url === "/vue.v2.7.16.js") {
+  //   // http://127.0.0.1:8080/vue.v2.7.16.js
+  //   res.type("application/javascript"); // 手动设置 Content-Type
+  //   console.log(__dirname);
+  //   res.sendFile(path.join(__dirname, "public", "../../vue/vue.v2.7.16.js"));
+  // }
 });
 
 server.listen(8080);

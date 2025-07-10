@@ -36,7 +36,7 @@ const App = {
   },
   preFetch: async function name(params) {
     console.log("preFetch 开始，发送请求");
-    const responseData = await axios.get("http://localhost:8080/data.json");
+    const responseData = await axios.get("https://cdn.jsdelivr.net/gh/shengshuqiang/sheng-vue-playground@main/vue-ssr/data.json");
     preFetchData.data = responseData.data;
     console.log("preFetch 结束，请求返回", responseData.data);
   },
@@ -78,7 +78,7 @@ function serverSideRendering(req, res) {
       .renderToString(appVue, context)
       .then((html) => {
         const allCSRCode = `${CSR_CODE} new Vue({render: (h) => h(App)}).$mount("#app");`;
-        const scriptStr = `<script src="http://127.0.0.1:8080/vue.v2.7.16.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.15.3/axios.min.js"></script><script>${allCSRCode}</script>`;
+        const scriptStr = `<script src="https://cdn.jsdelivr.net/gh/shengshuqiang/sheng-vue-playground@main/vue/vue.v2.7.16.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.15.3/axios.min.js"></script><script>${allCSRCode}</script>`;
         const targetHtml = HTML_TEMPLATE.replace(
           '<div id="app"></div>',
           html
@@ -113,16 +113,18 @@ server.get("*", (req, res) => {
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   // 设置预检请求的缓存时间（可选）
   res.setHeader("Access-Control-Max-Age", "3600");
-  if (req.url === "/data.json") {
-    res.status(200).json({ name: "sheng_SSU" });
-  } else if (req.url === "/app.html") {
+  // if (req.url === "/data.json") {
+  //   res.status(200).json({ name: "sheng_SSU" });
+  // } else 
+  if (req.url === "/app.html") {
     serverSideRendering(req, res);
-  } else if (req.url === "/vue.v2.7.16.js") {
-    // http://127.0.0.1:8080/vue.v2.7.16.js
-    res.type("application/javascript"); // 手动设置 Content-Type
-    console.log(__dirname);
-    res.sendFile(path.join(__dirname, "public", "../../vue/vue.v2.7.16.js"));
-  }
+  } 
+  // else if (req.url === "/vue.v2.7.16.js") {
+  //   // http://127.0.0.1:8080/vue.v2.7.16.js
+  //   res.type("application/javascript"); // 手动设置 Content-Type
+  //   console.log(__dirname);
+  //   res.sendFile(path.join(__dirname, "public", "../../vue/vue.v2.7.16.js"));
+  // }
 });
 
 server.listen(8080);
